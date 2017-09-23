@@ -1,11 +1,15 @@
-package com.gazorpazorp.SAMPLE_APPLICATION;
+package com.gazorpazorp.ShoppingCartService;
 
+import javax.annotation.PostConstruct;
+
+import org.hsqldb.util.DatabaseManagerSwing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
@@ -19,7 +23,8 @@ import feign.RequestInterceptor;
 @SpringBootApplication(scanBasePackages="com.gazorpazorp")
 @EnableJpaRepositories("com.gazorpazorp.repository")
 @EntityScan(basePackages="com.gazorpazorp")
-//@EnableEurekaClient
+@EnableJpaAuditing
+@EnableEurekaClient
 @EnableFeignClients("com.gazorpazorp.client")
 @EnableResourceServer
 @EnableOAuth2Client
@@ -34,5 +39,11 @@ public class ShoppingCartServiceApplication {
 	RequestInterceptor oauth2FeignRequestInterceptor(OAuth2ClientContext context) {
 		if (context == null) return null;
 		return new CustomOAuth2FeignRequestInterceptor(context);
+	}
+	
+	@PostConstruct
+	public void getDbManager(){
+	   DatabaseManagerSwing.main(
+		new String[] { "--url", "jdbc:hsqldb:mem:test://localhost/test", "--user", "SA", "--password", ""});
 	}
 }

@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;
 
-import com.gazorpazorp.model.Sample;
+import com.gazorpazorp.model.CartEvent;
 import com.gazorpazorp.model.dto.SampleMinimalDto;
 
 
@@ -16,5 +16,5 @@ public interface SampleMapper {
 	
 	
 	@Mapping(target="sample")
-	SampleMinimalDto sampleToSampleMinimalDto(Sample sample);
+	SampleMinimalDto sampleToSampleMinimalDto(CartEvent sample);
 }
