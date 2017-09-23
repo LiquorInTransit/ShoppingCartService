@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: shopping-cart-service
+  cloud:
+    config:
+      uri: http://ec2-18-221-58-46.us-east-2.compute.amazonaws.com:8080
+    
+---
+
+spring:
+  profiles: dev
+  cloud:
+    config:
+      uri: http://localhost:8888
