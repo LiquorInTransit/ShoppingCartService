@@ -2,7 +2,9 @@ package com.gazorpazorp.client.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -27,13 +29,13 @@ public class CustomOAuth2FeignRequestInterceptor implements RequestInterceptor{
 
     @Override
     public void apply(RequestTemplate template) {
-        if (oAuth2ClientContext.getAccessTokenRequest().getExistingToken() == null) {
+    	String tokenString = ((OAuth2AuthenticationDetails)SecurityContextHolder.getContext().getAuthentication().getDetails()).getTokenValue();
+    	if (tokenString == null) {
             logger.warn("Cannot obtain existing token for request, if it is a non secured request, ignore.");
         } else {
             logger.debug("Constructing Header {} for Token {}", headerName, tokenTypeName);
-            template.header(headerName, String.format("%s %s", tokenTypeName, oAuth2ClientContext.getAccessTokenRequest().getExistingToken().toString()));
+            template.header(headerName, String.format("%s %s", tokenTypeName, tokenString));
         }
-
     }
 
 }

@@ -1,6 +1,7 @@
 package com.gazorpazorp.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -10,10 +11,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -33,11 +35,15 @@ public class CartEvent implements Serializable{
 	
 	@LastModifiedDate
 	private Date lastModified;
-	@CreatedDate
-	private Date createdAt;
+	//@CreatedDate
+	private Timestamp createdAt;
 	
 	public CartEvent() {}
 
+	@PrePersist
+	void onCreate() {
+		this.setCreatedAt(new Timestamp(new Date().getTime()));
+	}
 
 	
 	@Id
@@ -85,7 +91,7 @@ public class CartEvent implements Serializable{
 	}
 
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")	
     public Date getLastModified() {
         return lastModified;
     }
@@ -95,11 +101,10 @@ public class CartEvent implements Serializable{
     
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    @Column(name="created_at", columnDefinition="BIGINT")
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
