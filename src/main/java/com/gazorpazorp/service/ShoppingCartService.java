@@ -58,13 +58,7 @@ public class ShoppingCartService {
 		ShoppingCart shoppingCart = cartEvents
 				.takeWhile(cartEvent -> !ShoppingCart.isTerminal(cartEvent.getCartEventType()))
 				.reduceWith(() -> new ShoppingCart(), ShoppingCart::incorporate)
-				.get();
-		/*Flux<CartEvent> cartEvents = Flux.fromStream(cartEventRepository.getCartEventStreamByCustomer(customerId));
-		ShoppingCart shoppingCart = cartEvents
-				.takeWhile(cartEvent -> !ShoppingCart.isTerminal(cartEvent.getCartEventType()))
-				.reduceWith(() -> new ShoppingCart(), ShoppingCart::incorporate)
-				.get();*/
-		
+				.get();		
 		shoppingCart.getLineItems();
 		
 		return shoppingCart;
