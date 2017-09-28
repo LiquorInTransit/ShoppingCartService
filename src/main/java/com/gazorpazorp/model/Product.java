@@ -1,17 +1,21 @@
 package com.gazorpazorp.model;
 
-public class Product {
+import java.io.Serializable;
+
+public class Product implements Serializable{
+	
 	private Long id;
 	private String name, description;
-	private double price;
+	private double priceInCents;
 	
+	public Product() {}
 	
 	
 	public Product(Long id, String name, String description, double price) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
-		this.price = price;
+		this.priceInCents = price;
 	}
 	public Long getId() {
 		return id;
@@ -32,10 +36,17 @@ public class Product {
 		this.description = description;
 	}
 	public double getPrice() {
-		return price;
+		return priceInCents;
 	}
 	public void setPrice(double price) {
-		this.price = price;
+		this.priceInCents = price;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", name=" + name + ", description=" + description + ", priceInCents="
+				+ priceInCents + "]";
 	}
 	
 	

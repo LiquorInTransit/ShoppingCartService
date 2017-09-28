@@ -1,6 +1,8 @@
 package com.gazorpazorp.service;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gazorpazorp.client.AccountClient;
+import com.gazorpazorp.client.ProductClient;
 import com.gazorpazorp.model.CartEvent;
 import com.gazorpazorp.model.CartEventType;
+import com.gazorpazorp.model.Catalog;
+import com.gazorpazorp.model.Product;
 import com.gazorpazorp.model.ShoppingCart;
 import com.gazorpazorp.repository.CartEventRepository;
 
@@ -21,6 +26,8 @@ public class ShoppingCartService {
 
 	@Autowired
 	AccountClient accountClient;
+	@Autowired
+	ProductClient productClient;
 	@Autowired
 	CartEventRepository cartEventRepository;
 	
@@ -53,12 +60,23 @@ public class ShoppingCartService {
 	@Transactional(readOnly = true)
 	public ShoppingCart aggregateCartEvents(Long customerId) throws Exception {
 		CartEvent ev = cartEventRepository.findTopByCustomerIdAndCartEventTypeInOrderByCreatedAtDesc(customerId, Arrays.asList(CartEventType.CLEAR_CART, CartEventType.CHECKOUT));
-				
-		Flux<CartEvent> cartEvents = Flux.fromStream(cartEventRepository.findByCustomerIdAndCreatedAtAfterOrderByCreatedAtAsc(customerId, ev.getCreatedAt()));
+		Timestamp ts;
+		if (ev == null)
+			ts = new Timestamp(0);
+		else
+			ts = ev.getCreatedAt();
+		Flux<CartEvent> cartEvents = Flux.fromStream(cartEventRepository.findByCustomerIdAndCreatedAtAfterOrderByCreatedAtAsc(customerId, ts));
 		ShoppingCart shoppingCart = cartEvents
 				.takeWhile(cartEvent -> !ShoppingCart.isTerminal(cartEvent.getCartEventType()))
 				.reduceWith(() -> new ShoppingCart(), ShoppingCart::incorporate)
 				.get();		
+		
+		shoppingCart.getProductMap().entrySet().forEach(p -> System.out.println(productClient.getProductById(p.getKey())));
+		 Set<Product> products = shoppingCart.getProductMap().entrySet().stream().map(p -> productClient.getProductById(p.getKey()).getBody()).collect(Collectors.toSet());
+		 
+		 Catalog catalog = new Catalog(products);
+		 shoppingCart.setCatalog(catalog);
+		 		
 		shoppingCart.getLineItems();
 		
 		return shoppingCart;

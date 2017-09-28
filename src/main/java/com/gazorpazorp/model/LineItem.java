@@ -1,6 +1,9 @@
 package com.gazorpazorp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class LineItem {
+	@JsonIgnore
 	private Long productId;
 	private Product product;
 	private int qty;
