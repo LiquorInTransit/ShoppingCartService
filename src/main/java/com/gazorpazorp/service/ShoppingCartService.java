@@ -2,6 +2,7 @@ package com.gazorpazorp.service;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -71,9 +72,8 @@ public class ShoppingCartService {
 				.reduceWith(() -> new ShoppingCart(), ShoppingCart::incorporate)
 				.get();		
 		
-		shoppingCart.getProductMap().entrySet().forEach(p -> System.out.println(productClient.getProductById(p.getKey())));
-		 Set<Product> products = shoppingCart.getProductMap().entrySet().stream().map(p -> productClient.getProductById(p.getKey()).getBody()).collect(Collectors.toSet());
-		 
+		Set<Product> products = productClient.getProductsById(shoppingCart.getProductMap().entrySet().stream().map(e ->e.getKey().toString()).collect(Collectors.joining(","))).getBody();
+		
 		 Catalog catalog = new Catalog(products);
 		 shoppingCart.setCatalog(catalog);
 		 		
