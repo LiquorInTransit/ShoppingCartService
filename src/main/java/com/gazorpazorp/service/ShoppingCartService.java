@@ -2,7 +2,7 @@ package com.gazorpazorp.service;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Map.Entry;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,6 +38,7 @@ public class ShoppingCartService {
 		ShoppingCart shoppingCart = null;
 		if (customerId != null) {
 			shoppingCart = aggregateCartEvents(customerId);
+			shoppingCart.getLineItems().forEach(li -> li.getProduct().Incorporate());
 		}
 		return shoppingCart;
 	}
@@ -72,7 +73,9 @@ public class ShoppingCartService {
 				.reduceWith(() -> new ShoppingCart(), ShoppingCart::incorporate)
 				.get();		
 		
-		Set<Product> products = productClient.getProductsById(shoppingCart.getProductMap().entrySet().stream().map(e ->e.getKey().toString()).collect(Collectors.joining(","))).getBody();
+		Set<Product> products = new HashSet<>();
+		if (!shoppingCart.getProductMap().isEmpty())
+			products = productClient.getProductsById(shoppingCart.getProductMap().entrySet().stream().map(e ->e.getKey().toString()).collect(Collectors.joining(","))).getBody();
 		
 		 Catalog catalog = new Catalog(products);
 		 shoppingCart.setCatalog(catalog);

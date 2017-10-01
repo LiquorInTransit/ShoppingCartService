@@ -2,11 +2,13 @@ package com.gazorpazorp.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 public class Product implements Serializable{
 	
 	private Long id;
 	private String name, description;
-	private double priceInCents;
+	private double price;
 	
 	public Product() {}
 	
@@ -15,7 +17,7 @@ public class Product implements Serializable{
 		this.id = id;
 		this.name = name;
 		this.description = description;
-		this.priceInCents = price;
+		this.price = price;
 	}
 	public Long getId() {
 		return id;
@@ -35,18 +37,24 @@ public class Product implements Serializable{
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	@JsonAlias("price_in_cents")
 	public double getPrice() {
-		return priceInCents;
+		return price;
 	}
 	public void setPrice(double price) {
-		this.priceInCents = price;
+		this.price = price;
+	}
+	
+	public void Incorporate() {
+		System.out.println("HERES THE BEFORE PRICE: " + this.price);
+		this.price = this.price/100.0;
 	}
 
 
 	@Override
 	public String toString() {
 		return "Product [id=" + id + ", name=" + name + ", description=" + description + ", priceInCents="
-				+ priceInCents + "]";
+				+ price + "]";
 	}
 	
 	
