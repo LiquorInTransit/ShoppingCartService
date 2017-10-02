@@ -39,6 +39,10 @@ public class CartEvent implements Serializable{
 	private Timestamp createdAt;
 	
 	public CartEvent() {}
+	public CartEvent(CartEventType cartEventType) {
+		this.cartEventType = cartEventType;
+	}
+
 
 	@PrePersist
 	void onCreate() {

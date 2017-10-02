@@ -8,6 +8,7 @@ public class LineItem {
 	private Product product;
 	private int qty;
 	
+	public LineItem () {}
 	public LineItem (Long productId, Product product, int qty) {
 		this.productId = productId;
 		this.product = product;

@@ -2,7 +2,7 @@ package com.gazorpazorp.ShoppingCartService;
 
 import javax.annotation.PostConstruct;
 
-import org.hsqldb.util.DatabaseManagerSwing;
+//import org.hsqldb.util.DatabaseManagerSwing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -41,9 +41,9 @@ public class ShoppingCartServiceApplication {
 		return new CustomOAuth2FeignRequestInterceptor(context);
 	}
 	
-	@PostConstruct
-	public void getDbManager(){
-	   DatabaseManagerSwing.main(
-		new String[] { "--url", "jdbc:hsqldb:mem:test://localhost/test", "--user", "SA", "--password", ""});
-	}
+//	@PostConstruct
+//	public void getDbManager(){
+//	   DatabaseManagerSwing.main(
+//		new String[] { "--url", "jdbc:hsqldb:mem:test://localhost/test", "--user", "SA", "--password", ""});
+//	}
 }
