@@ -64,9 +64,10 @@ public class ShoppingCartService {
 	//TODO: Add check that productId belongs to a real product.
 	public Boolean addCartEvent(CartEvent cartEvent) {
 		Long customerId = getAuthenticatedCustomerId();
+		logger.info("Add cart Customer ID: " + customerId);
 		if (customerId != null) {
 			cartEvent.setCustomerId(customerId);
-			System.out.println(cartEventRepository.save(cartEvent));
+			logger.warn("Here's the event just added to the DB: " + cartEventRepository.save(cartEvent));
 		} else {
 			return null;
 		}
@@ -137,7 +138,7 @@ public class ShoppingCartService {
 						
 						checkoutResult.setOrder(orderResponse);
 					}
-					addCartEvent(new CartEvent(CartEventType.CHECKOUT));
+					logger.warn("Added checkout cart event: " + addCartEvent(new CartEvent(CartEventType.CHECKOUT)).toString());
 				}
 			}
 		}
