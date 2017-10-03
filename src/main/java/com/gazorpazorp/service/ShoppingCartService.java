@@ -67,7 +67,7 @@ public class ShoppingCartService {
 		logger.info("Add cart Customer ID: " + customerId);
 		if (customerId != null) {
 			cartEvent.setCustomerId(customerId);
-			logger.warn("Here's the event just added to the DB: " + cartEventRepository.save(cartEvent));
+			logger.warn("Here's the event just added to the DB: " + cartEventRepository.saveAndFlush(cartEvent));
 		} else {
 			return null;
 		}
@@ -100,11 +100,10 @@ public class ShoppingCartService {
 		 shoppingCart.setCatalog(catalog);
 		 		
 		shoppingCart.getLineItems();
-		
 		return shoppingCart;
 	}
 	
-	@Transactional(readOnly = true)
+	@Transactional
 	public CheckoutResult checkout(Long quoteId) throws Exception {
 		CheckoutResult checkoutResult = new CheckoutResult();
 		
