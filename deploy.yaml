@@ -131,6 +131,15 @@
           instance-state-name: running
        region: "{{ region }}"
     register: old_green
+    
+  - name: Call shutdown endpoint of old green server
+    uri:
+      url: http://{{old_green.instances[0].private_ip_address}}:8080/mgmt/shutdown
+      user: admin
+      password: admin
+      force_basic_auth: yes
+      method: POST
+    ignore_errors: yes
 
   - name: Terminate the existing Green Server.
     ec2:

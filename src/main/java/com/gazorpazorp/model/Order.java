@@ -13,6 +13,8 @@ public class Order {
 	
 	private Set<OrderLineItem> items;
 	
+	private String trackingURL;
+	
 	public Order() {}
 
 	public Long getId() {
@@ -54,6 +56,14 @@ public class Order {
 	public void setItems(Set<OrderLineItem> items) {
 		this.items = items;
 	}
+
+	public String getTrackingURL() {
+		return trackingURL;
+	}
+	public void setTrackingURL(String trackingURL) {
+		this.trackingURL = trackingURL;
+	}
+	
 	
 	
 }
