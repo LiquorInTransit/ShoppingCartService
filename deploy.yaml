@@ -5,7 +5,7 @@
   vars: 
      region: us-east-2
      keypair_name: lit-backend-keypair
-     instance_type: t2.micro
+     instance_type: t2.nano
      image_name: ami-8a7859ef
   
   tasks:
