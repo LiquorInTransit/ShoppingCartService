@@ -56,9 +56,15 @@ public class ShoppingCartService {
 		ShoppingCart shoppingCart = null;
 		if (customerId != null) {
 			shoppingCart = aggregateCartEvents(customerId);
-			shoppingCart.getLineItems().forEach(li -> li.getProduct().Incorporate());
+		//	shoppingCart.getLineItems().forEach(li -> li.getProduct().Incorporate());
 		}
 		return shoppingCart;
+	}
+	
+	@Transactional(readOnly = true)
+	public Integer getCount() throws Exception {
+		ShoppingCart cart = getShoppingCart();
+		return cart.getLineItems().stream().mapToInt(LineItem::getQty).sum();
 	}
 	
 	//TODO: Add check that productId belongs to a real product.
@@ -99,7 +105,7 @@ public class ShoppingCartService {
 		 Catalog catalog = new Catalog(products);
 		 shoppingCart.setCatalog(catalog);
 		 		
-		shoppingCart.getLineItems();
+		shoppingCart.getLineItems().forEach(li -> li.getProduct().Incorporate());
 		return shoppingCart;
 	}
 	

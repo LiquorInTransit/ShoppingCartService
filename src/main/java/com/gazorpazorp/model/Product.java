@@ -3,11 +3,12 @@ package com.gazorpazorp.model;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Product implements Serializable{
 	
 	private Long id;
-	private String name, description;
+	private String name, description, producerName, imageThumbUrl, packageType;
 	private double price;
 	
 	public Product() {}
@@ -37,6 +38,32 @@ public class Product implements Serializable{
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	@JsonProperty("producer_name")
+	public String getProducerName() {
+		return producerName;
+	}
+	public void setProducerName(String producerName) {
+		this.producerName = producerName;
+	}
+
+	@JsonProperty("image_thumb_url")
+	public String getImageThumbUrl() {
+		return imageThumbUrl;
+	}
+	public void setImageThumbUrl(String imageThumbUrl) {
+		this.imageThumbUrl = imageThumbUrl;
+	}
+
+	@JsonProperty("package")
+	public String getPackageType() {
+		return packageType;
+	}
+	public void setPackageType(String packageType) {
+		this.packageType = packageType;
+	}
+
+
 	@JsonAlias("price_in_cents")
 	public double getPrice() {
 		return price;

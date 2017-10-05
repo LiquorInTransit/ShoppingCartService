@@ -1,5 +1,7 @@
 package com.gazorpazorp.controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,13 @@ public class ShoppingCartController {
 		return Optional.ofNullable(shoppingCartService.getShoppingCart())
 				.map(cart -> new ResponseEntity<>(cart, HttpStatus.OK))
 				.orElseThrow(() -> new Exception("Could not find shopping cart"));
+	}
+	
+	@GetMapping("/count")
+	public ResponseEntity getCartCount() throws Exception {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("count", shoppingCartService.getCount());
+		return new ResponseEntity(map, HttpStatus.OK);
 	}
 	
 	@PostMapping("/checkout")
