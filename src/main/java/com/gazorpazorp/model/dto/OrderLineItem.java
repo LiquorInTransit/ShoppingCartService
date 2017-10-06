@@ -3,6 +3,7 @@ package com.gazorpazorp.model.dto;
 public class OrderLineItem {
 	private Long productId;
 	private String productName;
+	private String imageThumbUrl;
 	private double price;
 	private int qty;
 	
@@ -21,6 +22,14 @@ public class OrderLineItem {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
+	
+	public String getImageThumbUrl() {
+		return imageThumbUrl;
+	}
+	public void setImageThumbUrl(String imageThumbUrl) {
+		this.imageThumbUrl = imageThumbUrl;
+	}
+
 	public double getPrice() {
 		return price;
 	}
