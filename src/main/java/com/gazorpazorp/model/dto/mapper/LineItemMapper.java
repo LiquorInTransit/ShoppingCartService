@@ -15,6 +15,6 @@ public interface LineItemMapper {
 	@Mapping(target="productName", source="item.product.name")
 	@Mapping(target="qty")
 	@Mapping(target="price", source="item.product.price")
-	@Mapping(target="imageThumbUrl", source="item.prodcut.imageThumbUrl")
+	@Mapping(target="imageThumbUrl", source="item.product.imageThumbUrl")
 	OrderLineItem lineItemToOrderLineItem(LineItem item);
 }

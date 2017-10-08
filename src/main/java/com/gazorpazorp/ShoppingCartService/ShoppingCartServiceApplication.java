@@ -1,8 +1,5 @@
 package com.gazorpazorp.ShoppingCartService;
 
-import javax.annotation.PostConstruct;
-
-//import org.hsqldb.util.DatabaseManagerSwing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
