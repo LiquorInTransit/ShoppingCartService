@@ -58,6 +58,6 @@ public class ShoppingCartServiceApplication {
 //	@PostConstruct
 //	public void getDbManager(){
 //	   DatabaseManagerSwing.main(
-//		new String[] { "--url", "jdbc:hsqldb:mem:test://localhost/test", "--user", "SA", "--password", ""});
+//		new String[] { "--url", "jdbc:hsqldb:mem:test://localhost/test?characterEncoding=UTF-8", "--user", "SA", "--password", ""});
 //	}
 }
