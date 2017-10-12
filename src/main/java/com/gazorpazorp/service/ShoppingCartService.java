@@ -6,12 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ import com.gazorpazorp.repository.CartEventRepository;
 import reactor.core.publisher.Flux;
 
 @Service
+@Scope(proxyMode=ScopedProxyMode.TARGET_CLASS, value="request")
 public class ShoppingCartService {
 
 	@Autowired
@@ -50,9 +52,11 @@ public class ShoppingCartService {
 	
 	Logger logger = LoggerFactory.getLogger(ShoppingCartService.class);
 	
+	private Long customerId;
+	
 	@Transactional(readOnly = true)
 	public ShoppingCart getShoppingCart() throws Exception {
-		Long customerId = getAuthenticatedCustomerId();
+		this.customerId = getAuthenticatedCustomerId();
 		ShoppingCart shoppingCart = null;
 		if (customerId != null) {
 			shoppingCart = aggregateCartEvents(customerId);
@@ -81,7 +85,7 @@ public class ShoppingCartService {
 	}
 	
 	private Long getAuthenticatedCustomerId() {
-		return Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());//accountClient.getCustomer().getId();
+		return /*Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());*/accountClient.getCustomer().getId();
 	}
 	
 	@Transactional(readOnly = true)
@@ -132,7 +136,7 @@ public class ShoppingCartService {
 					//Create a new Order
 					Order orderResponse = null;
 					try {
-						orderResponse = orderClient.createOrder(currentCart.getLineItems().stream().map(item -> LineItemMapper.INSTANCE.lineItemToOrderLineItem(item)).collect(Collectors.toList()), quoteId);
+						orderResponse = orderClient.createOrder(currentCart.getLineItems().stream().map(item -> LineItemMapper.INSTANCE.lineItemToOrderLineItem(item)).collect(Collectors.toList()), quoteId, this.customerId);
 					} catch (Exception e) {
 						checkoutResult.setResultMessage("User already has an active order");
 						e.printStackTrace();

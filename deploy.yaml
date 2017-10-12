@@ -6,7 +6,7 @@
      region: us-east-2
      keypair_name: lit-backend-keypair
      instance_type: t2.nano
-     image_name: ami-8a7859ef
+     image_name: ami-e091bc85
   
   tasks:
     - name: Setup Global Vars
@@ -61,28 +61,28 @@
 
 - hosts: tag_Deploy_Blue, ec2hosts
   tasks:
-  - name: upgrade all packages
-    yum: name=* state=latest
-    become: true
-    
-  - name: Stop syslogging
-    service:
-      name: rsyslog
-      state: stopped
-    become: true
-  
-  - name: Install JDK
-    yum:
-       name: java-1.8.0-openjdk-devel
-       state: latest
-    become: true
-
-  - name: Use Java8 for Runtime Java
-    alternatives:
-       name: java
-       path: /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
-       link: /usr/bin/java
-    become: true
+#  - name: upgrade all packages
+#    yum: name=* state=latest
+#    become: true
+#    
+#  - name: Stop syslogging
+#    service:
+#      name: rsyslog
+#      state: stopped
+#    become: true
+#  
+#  - name: Install JDK
+#    yum:
+#       name: java-1.8.0-openjdk-devel
+#       state: latest
+#    become: true
+#
+#  - name: Use Java8 for Runtime Java
+#    alternatives:
+#       name: java
+#       path: /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+#       link: /usr/bin/java
+#    become: true
 
   - name: Send the deployment across to the new instance
     copy: 
