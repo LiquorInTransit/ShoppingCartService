@@ -1,9 +1,13 @@
 package com.gazorpazorp.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class OrderLineItem {
 	private Long productId;
 	private String productName;
 	private String imageThumbUrl;
+	private String producerName;
+	private String packageType;
 	private double price;
 	private int qty;
 	
@@ -28,6 +32,22 @@ public class OrderLineItem {
 	}
 	public void setImageThumbUrl(String imageThumbUrl) {
 		this.imageThumbUrl = imageThumbUrl;
+	}
+	
+	@JsonProperty("producer_name")
+	public String getProducerName() {
+		return producerName;
+	}
+	public void setProducerName(String producerName) {
+		this.producerName = producerName;
+	}
+	
+	@JsonProperty("package")
+	public String getPackageType() {
+		return packageType;
+	}
+	public void setPackageType(String packageType) {
+		this.packageType = packageType;
 	}
 
 	public double getPrice() {
