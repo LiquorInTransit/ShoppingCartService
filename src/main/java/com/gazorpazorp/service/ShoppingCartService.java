@@ -126,6 +126,10 @@ public class ShoppingCartService {
 		}
 		
 		if (currentCart != null) {
+			if (currentCart.getLineItems().isEmpty()) {
+				checkoutResult.setResultMessage("Your cart is empty. Add items to cart before checking out.");
+				return checkoutResult;
+			}
 			List<Inventory> inventory = inventoryClient.getInventoryForProductIds(currentCart.getLineItems().stream().map(LineItem::getProductId).map(Object::toString).collect(Collectors.joining(",")), quoteId);
 			
 			if (!inventory.isEmpty()) {
@@ -165,7 +169,7 @@ public class ShoppingCartService {
 			List<LineItem> inventoryNotAvailable = currentCart.getLineItems().stream().filter(item -> inventoryItems.get(item.getProductId()) - item.getQty() < 0).collect(Collectors.toList());
 			
 			if (inventoryNotAvailable.size() > 0) {
-				String productIdList = inventoryNotAvailable.stream().map(LineItem::getProductId).map(Object::toString).collect(Collectors.joining(","));
+				String productIdList = inventoryNotAvailable.stream().map(LineItem::getProduct).map(Product::getName).collect(Collectors.joining(", "));
 				checkoutResult.setResultMessage(String.format("Insufficient inventory available for %s. Lower the quantity of these products and try again.", productIdList));
 				hasInventory = false;
 			}
