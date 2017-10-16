@@ -2,16 +2,20 @@ package com.gazorpazorp.model;
 
 import java.util.Set;
 
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.format.annotation.NumberFormat.Style;
+
 import com.gazorpazorp.model.dto.OrderLineItem;
 
 public class Order {
 	private Long id;
 	private Long customerId;		
 
+	@NumberFormat(style=Style.CURRENCY)
 	private double total;
 	private String status;
 	
-	private Set<OrderLineItem> items;
+	private Set<LineItem> items;
 	
 	private String trackingURL;
 	
@@ -33,6 +37,7 @@ public class Order {
 		this.customerId = customerId;
 	}
 
+	@NumberFormat(style=Style.CURRENCY)
 	public double getTotal() {
 		return total;
 	}
@@ -49,11 +54,11 @@ public class Order {
 		this.status = status;
 	}
 
-	public Set<OrderLineItem> getItems() {
+	public Set<LineItem> getItems() {
 		return items;
 	}
 
-	public void setItems(Set<OrderLineItem> items) {
+	public void setItems(Set<LineItem> items) {
 		this.items = items;
 	}
 

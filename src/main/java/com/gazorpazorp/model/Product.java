@@ -8,16 +8,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Product implements Serializable{
 	
 	private Long id;
-	private String name, description, producerName, imageThumbUrl, packageType;
+	private String name, producerName, imageThumbUrl, packageType;
 	private double price;
 	
 	public Product() {}
 	
 	
-	public Product(Long id, String name, String description, double price) {
+	public Product(Long id, String name/*, String description*/, double price) {
 		this.id = id;
 		this.name = name;
-		this.description = description;
+	//	this.description = description;
 		this.price = price;
 	}
 	public Long getId() {
@@ -32,12 +32,12 @@ public class Product implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
+//	public String getDescription() {
+//		return description;
+//	}
+//	public void setDescription(String description) {
+//		this.description = description;
+//	}
 	
 	@JsonProperty("producer_name")
 	public String getProducerName() {
@@ -80,7 +80,7 @@ public class Product implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Product [id=" + id + ", name=" + name + ", description=" + description + ", priceInCents="
+		return "Product [id=" + id + ", name=" + name  + ", priceInCents="
 				+ price + "]";
 	}
 	

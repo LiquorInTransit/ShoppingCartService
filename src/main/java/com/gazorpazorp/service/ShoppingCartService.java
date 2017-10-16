@@ -136,7 +136,7 @@ public class ShoppingCartService {
 					//Create a new Order
 					Order orderResponse = null;
 					try {
-						orderResponse = orderClient.createOrder(currentCart.getLineItems().stream().map(item -> LineItemMapper.INSTANCE.lineItemToOrderLineItem(item)).collect(Collectors.toList()), quoteId, this.customerId);
+						orderResponse = orderClient.createOrder(currentCart.getLineItems(), quoteId, this.customerId);
 					} catch (Exception e) {
 						checkoutResult.setResultMessage("User already has an active order");
 						e.printStackTrace();
