@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.gazorpazorp.client.config.TokenRequestClientConfiguration;
 import com.gazorpazorp.model.Product;
 
-@FeignClient(name="product-service", configuration = TokenRequestClientConfiguration.class)
+@FeignClient(name="product-and-store-service", configuration = TokenRequestClientConfiguration.class)
 public interface ProductClient {
 	@GetMapping(value="/internal/products/{id}", consumes = "application/json")
 	ResponseEntity<Product> getProductById(@PathVariable("id")Long id);
