@@ -83,6 +83,17 @@
 #       path: /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
 #       link: /usr/bin/java
 #    become: true
+  - name: Install sysstat
+    yum:
+      name: sysstat
+      state: latest
+    become: true
+  - name: Start sysstat
+    service:
+      name: sysstat
+      state: started
+      enabled: yes
+    become: true
 
   - name: Send the deployment across to the new instance
     copy: 
