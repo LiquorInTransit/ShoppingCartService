@@ -20,6 +20,12 @@ public class CheckoutResult {
 	public void setResultMessage(String resultMessage) {
 		this.resultMessage = resultMessage;
 	}
+	public void appendResultMessage(String resultMessage) {
+		if (this.resultMessage == null)
+			this.resultMessage = new String(resultMessage);
+		else
+			this.resultMessage += (this.resultMessage.isEmpty()?"":". ") + resultMessage;
+	}
 	
 	public Order getOrder() {
 		return order;

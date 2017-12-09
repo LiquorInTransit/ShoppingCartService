@@ -147,7 +147,7 @@ public class ShoppingCartService {
 						return checkoutResult;
 					}
 					if (orderResponse != null) {
-						checkoutResult.setResultMessage("Order created");
+						checkoutResult.appendResultMessage("Order created");
 						//Add Order Event (orders are not currently event sourced, so this step may be skipped)
 						
 						checkoutResult.setOrder(orderResponse);
@@ -164,6 +164,13 @@ public class ShoppingCartService {
 	
 	public boolean checkAvailableInventory(CheckoutResult checkoutResult, ShoppingCart currentCart, Map<Long, Integer> inventoryItems) {
 		boolean hasInventory = true;
+		//First, check to make sure the inventory-service could actually contact the LCBO API (inventory will receive -1 for count if it couldn't contact the LCBO API)
+		//If information is not available, warn the user and go ahead with the order.
+		if (inventoryItems.entrySet().stream().filter(ii -> ii.getValue().equals(-1)).collect(Collectors.toList()).size()>0) {
+			inventoryItems.entrySet().forEach(System.out::println);
+			checkoutResult.setResultMessage("Inventory unavailable. Your driver will contact you if items are not in stock");
+			return true;
+		}
 		//determine if inventory is available
 		try {
 			List<LineItem> inventoryNotAvailable = currentCart.getLineItems().stream().filter(item -> inventoryItems.get(item.getProductId()) - item.getQty() < 0).collect(Collectors.toList());
