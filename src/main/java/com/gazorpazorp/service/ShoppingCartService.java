@@ -76,7 +76,7 @@ public class ShoppingCartService {
 	
 	//TODO: Add check that productId belongs to a real product.
 	public Boolean addCartEvent(CartEvent cartEvent) {
-		//Long customerId = getAuthenticatedCustomerId();
+		getAuthenticatedCustomerId();
 		logger.info("Add cart Customer ID: " + customer.getId());
 		if (customer.getId() != null) {
 			cartEvent.setCustomerId(customer.getId());
