@@ -59,7 +59,7 @@ public class ShoppingCartService {
 	
 	@Transactional(readOnly = true)
 	public ShoppingCart getShoppingCart() throws Exception {
-		getAuthenticatedCustomerId();
+		getAuthenticatedCustomer();
 		ShoppingCart shoppingCart = null;
 		if (customer.getId() != null) {
 			shoppingCart = aggregateCartEvents(customer.getId());
@@ -76,7 +76,7 @@ public class ShoppingCartService {
 	
 	//TODO: Add check that productId belongs to a real product.
 	public Boolean addCartEvent(CartEvent cartEvent) {
-		getAuthenticatedCustomerId();
+		getAuthenticatedCustomer();
 		logger.info("Add cart Customer ID: " + customer.getId());
 		if (customer.getId() != null) {
 			cartEvent.setCustomerId(customer.getId());
@@ -87,7 +87,7 @@ public class ShoppingCartService {
 		return true;
 	}
 	
-	private void getAuthenticatedCustomerId() {
+	private void getAuthenticatedCustomer() {
 		Customer customer = accountClient.getCustomer();
 		this.customer = customer;
 		//return /*Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());*/accountClient.getCustomer().getId();
