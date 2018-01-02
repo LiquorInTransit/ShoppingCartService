@@ -1,8 +1,11 @@
 package com.gazorpazorp.model;
 
+import org.springframework.http.HttpStatus;
+
 public class CheckoutResult {
 	private String resultMessage;
 	private Order order;
+	Integer status;
 	
 	public CheckoutResult() {}
 	public CheckoutResult(String resultMessage) {
@@ -34,6 +37,14 @@ public class CheckoutResult {
 		this.order = order;
 	}
 	
+	
+	
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 	@Override
 	public String toString() {
 		return "CheckoutResult [resultMessage=" + resultMessage + "]";

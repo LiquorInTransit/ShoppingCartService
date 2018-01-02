@@ -13,24 +13,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gazorpazorp.client.AccountClient;
 import com.gazorpazorp.client.InventoryClient;
 import com.gazorpazorp.client.OrderClient;
+import com.gazorpazorp.client.PaymentClient;
 import com.gazorpazorp.client.ProductClient;
 import com.gazorpazorp.model.CartEvent;
 import com.gazorpazorp.model.CartEventType;
 import com.gazorpazorp.model.Catalog;
 import com.gazorpazorp.model.CheckoutResult;
+import com.gazorpazorp.model.Customer;
 import com.gazorpazorp.model.Inventory;
 import com.gazorpazorp.model.LineItem;
 import com.gazorpazorp.model.Order;
 import com.gazorpazorp.model.Product;
 import com.gazorpazorp.model.ShoppingCart;
-import com.gazorpazorp.model.dto.mapper.LineItemMapper;
 import com.gazorpazorp.repository.CartEventRepository;
 
 import reactor.core.publisher.Flux;
@@ -48,18 +49,20 @@ public class ShoppingCartService {
 	@Autowired
 	InventoryClient inventoryClient;
 	@Autowired
+	PaymentClient paymentClient;
+	@Autowired
 	CartEventRepository cartEventRepository;
 	
 	Logger logger = LoggerFactory.getLogger(ShoppingCartService.class);
 	
-	private Long customerId;
+	private Customer customer;
 	
 	@Transactional(readOnly = true)
 	public ShoppingCart getShoppingCart() throws Exception {
-		this.customerId = getAuthenticatedCustomerId();
+		getAuthenticatedCustomerId();
 		ShoppingCart shoppingCart = null;
-		if (customerId != null) {
-			shoppingCart = aggregateCartEvents(customerId);
+		if (customer.getId() != null) {
+			shoppingCart = aggregateCartEvents(customer.getId());
 		//	shoppingCart.getLineItems().forEach(li -> li.getProduct().Incorporate());
 		}
 		return shoppingCart;
@@ -73,10 +76,10 @@ public class ShoppingCartService {
 	
 	//TODO: Add check that productId belongs to a real product.
 	public Boolean addCartEvent(CartEvent cartEvent) {
-		Long customerId = getAuthenticatedCustomerId();
-		logger.info("Add cart Customer ID: " + customerId);
-		if (customerId != null) {
-			cartEvent.setCustomerId(customerId);
+		//Long customerId = getAuthenticatedCustomerId();
+		logger.info("Add cart Customer ID: " + customer.getId());
+		if (customer.getId() != null) {
+			cartEvent.setCustomerId(customer.getId());
 			logger.warn("Here's the event just added to the DB: " + cartEventRepository.saveAndFlush(cartEvent));
 		} else {
 			return null;
@@ -84,8 +87,10 @@ public class ShoppingCartService {
 		return true;
 	}
 	
-	private Long getAuthenticatedCustomerId() {
-		return /*Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());*/accountClient.getCustomer().getId();
+	private void getAuthenticatedCustomerId() {
+		Customer customer = accountClient.getCustomer();
+		this.customer = customer;
+		//return /*Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());*/accountClient.getCustomer().getId();
 	}
 	
 	@Transactional(readOnly = true)
@@ -128,6 +133,7 @@ public class ShoppingCartService {
 		if (currentCart != null) {
 			if (currentCart.getLineItems().isEmpty()) {
 				checkoutResult.setResultMessage("Your cart is empty. Add items to cart before checking out.");
+				checkoutResult.setStatus(HttpStatus.NO_CONTENT.value());
 				return checkoutResult;
 			}
 			List<Inventory> inventory = inventoryClient.getInventoryForProductIds(currentCart.getLineItems().stream().map(LineItem::getProductId).map(Object::toString).collect(Collectors.joining(",")), quoteId);
@@ -137,16 +143,25 @@ public class ShoppingCartService {
 				Map<Long, Integer> inventoryItems = inventory.stream().collect(Collectors.toMap(Inventory::getProductId, Inventory::getCount));
 				
 				if (checkAvailableInventory(checkoutResult, currentCart, inventoryItems)) {
-					//Create a new Order
+					//Create a new OrderResponse
 					Order orderResponse = null;
+					
+					//make the order
 					try {
-						orderResponse = orderClient.createOrder(currentCart.getLineItems(), quoteId, this.customerId);
+						orderResponse = orderClient.createOrder(currentCart.getLineItems(), quoteId, this.customer.getId());
 					} catch (Exception e) {
 						checkoutResult.setResultMessage("User already has an active order");
 						e.printStackTrace();
 						return checkoutResult;
 					}
 					if (orderResponse != null) {
+						//Take the customers money
+						HttpStatus paymentStatus = paymentClient.processPayment(customer.getStripeId(), orderResponse.getId(), Integer.valueOf((int) (orderResponse.getTotal()*1000))).getStatusCode();
+						if (paymentStatus != HttpStatus.OK) {
+							//cancel the order	
+							checkoutResult.setStatus(paymentStatus.value());
+							checkoutResult.setResultMessage("Payment Error");
+						}
 						checkoutResult.appendResultMessage("Order created");
 						//Add Order Event (orders are not currently event sourced, so this step may be skipped)
 						
@@ -178,6 +193,7 @@ public class ShoppingCartService {
 			if (inventoryNotAvailable.size() > 0) {
 				String productIdList = inventoryNotAvailable.stream().map(LineItem::getProduct).map(Product::getName).collect(Collectors.joining(", "));
 				checkoutResult.setResultMessage(String.format("Insufficient inventory available for %s. Lower the quantity of these products and try again.", productIdList));
+				checkoutResult.setStatus(HttpStatus.NOT_FOUND.value());
 				hasInventory = false;
 			}
 		} catch (Exception e) {
