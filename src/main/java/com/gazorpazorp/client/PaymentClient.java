@@ -11,5 +11,5 @@ import com.gazorpazorp.client.config.TokenRequestClientConfiguration;
 public interface PaymentClient {
 
 	@PostMapping("/api/payments/processPayment")
-	public ResponseEntity processPayment(@RequestParam String customerId, @RequestParam Long orderId, @RequestParam Integer amount);
+	public ResponseEntity processPayment(@RequestParam("customerId") String customerId, @RequestParam("orderId") Long orderId, @RequestParam("amount") Integer amount);
 }
