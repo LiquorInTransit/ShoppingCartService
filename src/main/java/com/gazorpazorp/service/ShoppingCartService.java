@@ -157,15 +157,16 @@ public class ShoppingCartService {
 					if (orderResponse != null) {
 						//Take the customers money
 						HttpStatus paymentStatus = paymentClient.processPayment(customer.getStripeId(), orderResponse.getId(), Integer.valueOf((int) (orderResponse.getTotal()*1000))).getStatusCode();
+						checkoutResult.setStatus(paymentStatus.value());
 						if (paymentStatus != HttpStatus.OK) {
 							//cancel the order	
-							checkoutResult.setStatus(paymentStatus.value());
 							checkoutResult.setResultMessage("Payment Error");
+						} else {
+							checkoutResult.appendResultMessage("Order created");
+							//Add Order Event (orders are not currently event sourced, so this step may be skipped)
+							
+							checkoutResult.setOrder(orderResponse);
 						}
-						checkoutResult.appendResultMessage("Order created");
-						//Add Order Event (orders are not currently event sourced, so this step may be skipped)
-						
-						checkoutResult.setOrder(orderResponse);
 					}
 					logger.warn("Added checkout cart event: " + addCartEvent(new CartEvent(CartEventType.CHECKOUT)).toString());
 				}
