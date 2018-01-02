@@ -10,6 +10,6 @@ import com.gazorpazorp.client.config.TokenRequestClientConfiguration;
 @FeignClient(name="payment-service", configuration = TokenRequestClientConfiguration.class)
 public interface PaymentClient {
 
-	@PostMapping("/payments/processPayment")
+	@PostMapping("/api/payments/processPayment")
 	public ResponseEntity processPayment(@RequestParam String customerId, @RequestParam Long orderId, @RequestParam Integer amount);
 }
