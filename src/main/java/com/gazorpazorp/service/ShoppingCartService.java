@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ import com.gazorpazorp.model.Order;
 import com.gazorpazorp.model.Product;
 import com.gazorpazorp.model.ShoppingCart;
 import com.gazorpazorp.repository.CartEventRepository;
+import com.stripe.Stripe;
 
 import reactor.core.publisher.Flux;
 
@@ -54,6 +57,9 @@ public class ShoppingCartService {
 	CartEventRepository cartEventRepository;
 	
 	Logger logger = LoggerFactory.getLogger(ShoppingCartService.class);
+	
+	@Value("${stripe.secret-key}")
+	String secretKey;
 	
 	private Customer customer;
 	
@@ -130,6 +136,14 @@ public class ShoppingCartService {
 			logger.error("Could not retrieve shopping cart", e);
 		}
 		
+		//Check if the customer has a payment method
+		Stripe.apiKey=secretKey;
+		com.stripe.model.Customer cust = com.stripe.model.Customer.retrieve(customer.getStripeId());
+		if (cust.getDefaultSource()==null) {
+			checkoutResult.setResultMessage("No Payment Method");
+			checkoutResult.setStatus(HttpStatus.CONFLICT.value()); //409
+		}
+		
 		if (currentCart != null) {
 			if (currentCart.getLineItems().isEmpty()) {
 				checkoutResult.setResultMessage("Your cart is empty. Add items to cart before checking out.");
@@ -146,29 +160,39 @@ public class ShoppingCartService {
 					//Create a new OrderResponse
 					Order orderResponse = null;
 					
-					//make the order
+					//make the order (this also processes the payment)
 					try {
-						orderResponse = orderClient.createOrder(currentCart.getLineItems(), quoteId, this.customer.getId());
+						ResponseEntity<Order> orderEntity = orderClient.createOrder(currentCart.getLineItems(), quoteId, this.customer.getId());
+						if (orderEntity.getStatusCode() == HttpStatus.OK) {
+							//Continue with returning the order
+							orderResponse = orderEntity.getBody();
+							checkoutResult.appendResultMessage("Order created");
+							checkoutResult.setOrder(orderResponse);
+							logger.warn("Added checkout cart event: " + addCartEvent(new CartEvent(CartEventType.CHECKOUT)).toString());
+						} else {
+							//Don't continue
+							checkoutResult.setResultMessage("Payment Error");
+							checkoutResult.setStatus(orderEntity.getStatusCodeValue());
+						}
 					} catch (Exception e) {
 						checkoutResult.setResultMessage("User already has an active order");
 						e.printStackTrace();
-						return checkoutResult;
 					}
-					if (orderResponse != null) {
+					/*if (orderResponse != null) {
 						//Take the customers money
-						HttpStatus paymentStatus = paymentClient.processPayment(customer.getStripeId(), orderResponse.getId(), Integer.valueOf((int) (orderResponse.getTotal()*1000))).getStatusCode();
+						HttpStatus paymentStatus = paymentClient.processPayment(customer.getStripeId(), orderResponse.getId(), Integer.valueOf((int) (orderResponse.getTotal()*100))).getStatusCode();
 						checkoutResult.setStatus(paymentStatus.value());
 						if (paymentStatus != HttpStatus.OK) {
 							//cancel the order	
-							checkoutResult.setResultMessage("Payment Error");
+							
 						} else {
-							checkoutResult.appendResultMessage("Order created");
+							
 							//Add Order Event (orders are not currently event sourced, so this step may be skipped)
 							
-							checkoutResult.setOrder(orderResponse);
+							
 						}
 					}
-					logger.warn("Added checkout cart event: " + addCartEvent(new CartEvent(CartEventType.CHECKOUT)).toString());
+					logger.warn("Added checkout cart event: " + addCartEvent(new CartEvent(CartEventType.CHECKOUT)).toString());*/
 				}
 			}
 		}

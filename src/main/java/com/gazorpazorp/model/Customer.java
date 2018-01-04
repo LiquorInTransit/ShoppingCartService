@@ -11,5 +11,15 @@ public class Customer {
 	public String getStripeId() {
 		return stripeId;
 	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setStripeId(String stripeId) {
+		this.stripeId = stripeId;
+	}
+	
+	
 	
 }
