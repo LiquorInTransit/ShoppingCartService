@@ -142,6 +142,7 @@ public class ShoppingCartService {
 		if (cust.getDefaultSource()==null) {
 			checkoutResult.setResultMessage("No Payment Method");
 			checkoutResult.setStatus(HttpStatus.CONFLICT.value()); //409
+			return checkoutResult;
 		}
 		
 		if (currentCart != null) {
@@ -168,10 +169,11 @@ public class ShoppingCartService {
 							orderResponse = orderEntity.getBody();
 							checkoutResult.appendResultMessage("Order created");
 							checkoutResult.setOrder(orderResponse);
+							checkoutResult.setStatus(HttpStatus.OK.value());
 							logger.warn("Added checkout cart event: " + addCartEvent(new CartEvent(CartEventType.CHECKOUT)).toString());
 						} else {
 							//Don't continue
-							checkoutResult.setResultMessage("Payment Error");
+							checkoutResult.setResultMessage("Error Creating Order");
 							checkoutResult.setStatus(orderEntity.getStatusCodeValue());
 						}
 					} catch (Exception e) {
@@ -223,6 +225,7 @@ public class ShoppingCartService {
 			}
 		} catch (Exception e) {
 			logger.error("Error checking for available inventory");
+			return false;
 		}
 		return hasInventory;
 	}
