@@ -34,6 +34,7 @@ public class ShoppingCartServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ShoppingCartServiceApplication.class, args);
+		System.out.println("Hey I started");
 	}
 	
 	@Bean
